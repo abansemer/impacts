@@ -41,6 +41,10 @@ if ~exist(ncfile, 'file')
     return
 end
 
+%Get variables in the file
+finfo = ncinfo(ncfile);
+varnames = {finfo.Variables.Name};
+
 % Get new start and count values if starttime/stoptime are specified
 if ~isempty(options.starttime)
     time = ncread(ncfile, 'time');
@@ -70,10 +74,12 @@ data.startx = ncread(ncfile, 'startx', start, count);
 data.stopx = ncread(ncfile, 'stopx', start, count);
 data.starty = ncread(ncfile, 'starty', start, count);
 data.stopy = ncread(ncfile, 'stopy', start, count);
-data.t = ncread(ncfile, 't', start, count);
-data.lat = ncread(ncfile, 'lat', start, count);
-data.lon = ncread(ncfile, 'lon', start, count);
-data.alt = ncread(ncfile, 'alt', start, count);
+
+% Environmental variables, check first if they are available
+if sum(strcmp(varnames, 't')); data.t = ncread(ncfile, 't', start, count); end
+if sum(strcmp(varnames, 'lat')); data.lat = ncread(ncfile, 'lat', start, count); end
+if sum(strcmp(varnames, 'lon')); data.lon = ncread(ncfile, 'lon', start, count); end
+if sum(strcmp(varnames, 'alt')); data.alt = ncread(ncfile, 'alt', start, count); end
 
 % Load image if flagged
 if options.loadimage
