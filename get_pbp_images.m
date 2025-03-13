@@ -180,7 +180,11 @@ collage = transpose(255-collage)/255;
 
 %Make figure
 if options.noplot == 0
-    imageViewer(collage, "InitialMagnification", 100);
+    if exist('imageViewer')
+        imageViewer(collage, "InitialMagnification", 100);
+    elseif exist('imshow')
+        imshow(collage);
+    end
 end
 
 end

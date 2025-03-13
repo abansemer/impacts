@@ -12,6 +12,9 @@ FUNCTION load_pbp_file, fn, include_images=include_images
    ;Arrays are sometimes too big to use restorenc.pro routine.  Manually load data instead.
    ;More variables are available.  See documentation or variable listing in the files.
    ncid = ncdf_open(fn)
+   info = ncdf_inquire(ncid)
+   varlist = strarr(info.nvars)
+   FOR i = 0, info.nvars-1 DO varlist[i] = (ncdf_varinq(ncid,i)).name
    ncdf_varget, ncid, 'time', time
    ncdf_varget, ncid, 'diam', diam
    ncdf_varget, ncid, 'arearatio', arearatio
@@ -20,14 +23,28 @@ FUNCTION load_pbp_file, fn, include_images=include_images
    ncdf_varget, ncid, 'stopx', stopx
    ncdf_varget, ncid, 'starty', starty
    ncdf_varget, ncid, 'stopy', stopy
-   ncdf_varget, ncid, 't', t
-   ncdf_varget, ncid, 'lat', lat
-   ncdf_varget, ncid, 'lon', lon
-   ncdf_varget, ncid, 'alt', alt
+   out = {filename:fn, time:time, diam:diam, arearatio:arearatio, aspectratio:aspectratio, $
+      startx:startx, stopx:stopx, starty:starty, stopy:stopy}
+
+   ;Optional variables
+   IF total(varlist eq 't') THEN BEGIN
+      ncdf_varget, ncid, 't', t
+      out = create_struct(out, 't', t)
+   ENDIF
+   IF total(varlist eq 'lat') THEN BEGIN
+      ncdf_varget, ncid, 'lat', lat
+      out = create_struct(out, 'lat', lat)
+   ENDIF
+   IF total(varlist eq 'lon') THEN BEGIN
+      ncdf_varget, ncid, 'lon', lon
+      out = create_struct(out, 'lon', lon)
+   ENDIF
+   IF total(varlist eq 'alt') THEN BEGIN
+      ncdf_varget, ncid, 'alt', alt
+      out = create_struct(out, 'alt', alt)
+   ENDIF
 
    ncdf_close, ncid
 
-   return, {filename:fn, time:time, diam:diam, arearatio:arearatio, aspectratio:aspectratio, $
-      startx:startx, stopx:stopx, starty:starty, stopy:stopy, $
-      t:t, lat:lat, lon:lon, alt:alt}
+   return, out
 END
