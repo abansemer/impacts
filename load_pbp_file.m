@@ -84,15 +84,20 @@ if sum(strcmp(varnames, 'alt')); data.alt = ncread(ncfile, 'alt', start, count);
 % Load image if flagged
 if options.loadimage
     info = ncinfo(ncfile);   % Need array width from dimension(2)
-    imstart = [1 max(data.starty(1), 1)];
-    imcount = [info.Dimensions(2).Length data.stopy(end)-data.starty(1)+1];
+    firstslice = data.starty(1);
+    lastslice = data.stopy(end);
+    imstart = [1 firstslice+1];
+    imcount = [info.Dimensions(2).Length lastslice-firstslice+1];
     data.image = ncread(ncfile, 'image', imstart,  imcount);
+    if firstslice ~= 0
+        start = 2;  % Need to activate offset adjustment below
+    end
 end
 
 % Adjust y-index if a new start value has been applied
 if start > 1
     offset = data.starty(1);
-    data.starty = data.starty-offset+1;
-    data.stopy = data.stopy-offset+1;
+    data.starty = data.starty-offset;
+    data.stopy = data.stopy-offset;
 end
 end
