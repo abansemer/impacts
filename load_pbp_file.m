@@ -68,12 +68,22 @@ data.filename = ncfile;
 
 data.time = ncread(ncfile, 'time', start, count);
 data.diam = ncread(ncfile, 'diam', start, count);
+data.area = ncread(ncfile, 'area', start, count);
 data.arearatio = ncread(ncfile, 'arearatio', start, count);
 data.aspectratio = ncread(ncfile, 'aspectratio', start, count);
-data.startx = ncread(ncfile, 'startx', start, count);
-data.stopx = ncread(ncfile, 'stopx', start, count);
-data.starty = ncread(ncfile, 'starty', start, count);
-data.stopy = ncread(ncfile, 'stopy', start, count);
+data.orientation = ncread(ncfile,'orientation', start, count);
+data.rejectionflag = ncread(ncfile,'rejectionflag', start, count);
+data.edgetouch = ncread(ncfile,'edgetouch', start, count);
+
+% Get image start/stop positions, if available
+if sum(strcmp(varnames, 'startx'))
+    data.startx = ncread(ncfile, 'startx', start, count);
+    data.stopx = ncread(ncfile, 'stopx', start, count);
+    data.starty = ncread(ncfile, 'starty', start, count);
+    data.stopy = ncread(ncfile, 'stopy', start, count);
+else
+    options.loadimage = 0;  % No images available
+end
 
 % Environmental variables, check first if they are available
 if sum(strcmp(varnames, 't')); data.t = ncread(ncfile, 't', start, count); end
@@ -95,7 +105,7 @@ if options.loadimage
 end
 
 % Adjust y-index if a new start value has been applied
-if start > 1
+if (start > 1) && (options.loadimage > 0)
     offset = data.starty(1);
     data.starty = data.starty-offset;
     data.stopy = data.stopy-offset;

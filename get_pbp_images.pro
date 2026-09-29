@@ -1,4 +1,4 @@
-FUNCTION get_pbp_images, data, particleindex, show_images=show_images
+FUNCTION get_pbp_images, data, particleindex, show_images=show_images, wstart=wstart
    ;FUNCTION to retrieve multiple images in the PBP structure 'data' with index 'i'
    ;with option to show images to a graphics window.
    ;
@@ -8,6 +8,8 @@ FUNCTION get_pbp_images, data, particleindex, show_images=show_images
    ;   images = get_pbp_images(data, i)
 
    IF n_elements(show_images) eq 0 THEN show_images = 1
+   IF n_elements(wstart) eq 0 THEN wstart = 0   ;Starting window ID
+   loadct, 0   ;Black/white color table
 
    ;Check if have OAP or other probe by checking the stopx values (always the same for OAP)
    haveoap = 1
@@ -41,7 +43,7 @@ FUNCTION get_pbp_images, data, particleindex, show_images=show_images
 
    ;Show a page of images in a series of vertical strips
    IF show_images THEN BEGIN
-      iwindow = 0
+      iwindow = wstart
       window, iwindow, xsize=1000, ysize=1000
       s = size(image, /dim)
 
@@ -49,7 +51,7 @@ FUNCTION get_pbp_images, data, particleindex, show_images=show_images
       ypos = 0    ;Strip y-position
       FOR i = 0, s[1]/1000 DO BEGIN
          ;Extract strip
-         strip = image[*, i*1000:((i+1L)*1000-1)<(s[1]-1)]
+         strip = image[*, i*1000L:((i+1L)*1000-1)<(s[1]-1)]
          stripwidth = max(where(total(strip, 2) gt 0))
          strip = strip[0:stripwidth, *]
 
@@ -64,7 +66,7 @@ FUNCTION get_pbp_images, data, particleindex, show_images=show_images
          ypos += (stripwidth + 5)
 
          ;Exit loop if 5+ windows
-         IF iwindow ge 5 THEN BEGIN
+         IF (iwindow-wstart) ge 5 THEN BEGIN
              i = 99999999
              print, 'Too many images to show, returning.'
           ENDIF

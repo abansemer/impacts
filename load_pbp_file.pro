@@ -19,11 +19,12 @@ FUNCTION load_pbp_file, fn, include_images=include_images
    ncdf_varget, ncid, 'diam', diam
    ncdf_varget, ncid, 'arearatio', arearatio
    ncdf_varget, ncid, 'aspectratio', aspectratio
+   ncdf_varget, ncid, 'rejectionflag', rejectionflag
    ncdf_varget, ncid, 'startx', startx
    ncdf_varget, ncid, 'stopx', stopx
    ncdf_varget, ncid, 'starty', starty
    ncdf_varget, ncid, 'stopy', stopy
-   out = {filename:fn, time:time, diam:diam, arearatio:arearatio, aspectratio:aspectratio, $
+   out = {filename:fn, time:time, diam:diam, arearatio:arearatio, aspectratio:aspectratio, rejectionflag:rejectionflag, $
       startx:startx, stopx:stopx, starty:starty, stopy:stopy}
 
    ;Optional variables
